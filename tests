@@ -1,0 +1,32 @@
+mkdir -p tests
+cat > tests/simulate_traffic.py <<'EOF'
+import asyncio
+import httpx
+import random
+
+BASE = "http://localhost:8080"
+API_KEY = "demo-key"
+
+async def normal_user(client, id):
+    for _ in range(20):
+        q = random.choice(["apple","orange","banana"])
+        await client.get(f"{BASE}/search?q={q}", headers={"x-api-key": API_KEY})
+        await asyncio.sleep(random.uniform(0.1, 0.5))
+
+async def scraper(client):
+    for _ in range(200):
+        await client.get(f"{BASE}/search?q=scrape", headers={"x-api-key": "scraper"})
+        await asyncio.sleep(0.01)
+
+async def main():
+    async with httpx.AsyncClient() as client:
+        tasks = []
+        for i in range(10):
+            tasks.append(normal_user(client, i))
+        for i in range(3):
+            tasks.append(scraper(client))
+        await asyncio.gather(*tasks)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+EOF

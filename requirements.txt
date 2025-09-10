@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+redis>=4.6.0
+prometheus-client
+httpx
+python-dotenv
