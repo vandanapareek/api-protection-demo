@@ -31,12 +31,12 @@ GET /
 
 ### 2. Search API (example query)
 ```http
-GET /search?q=apple
+GET /search?q=python+developer
 ```
-🔗 [https://api-protection-demo.onrender.com/search?q=apple](https://api-protection-demo.onrender.com/search?q=apple)  
+🔗 [https://api-protection-demo.onrender.com/search?q=python+developer](https://api-protection-demo.onrender.com/search?q=python+developer)  
 ➡️ Returns:
 ```json
-{"query": "apple", "results": ["apple result 1", "apple result 2"]}
+{"query": "python developer", "results": ["Backend Python Developer - Singapore", "Full Stack Engineer (Python/React) - Remote","Senior Software Engineer - Django & FastAPI"]}
 ```
 
 ---
@@ -79,7 +79,7 @@ demo_blocked_total
 ---
 
 ## Example Metrics Flow
-1. Call `/search?q=apple` → `demo_requests_total` increases.  
+1. Call `/search?q=python+developer` → `demo_requests_total` increases.  
 2. Call `/protected` repeatedly → after the limit, `demo_blocked_total` increases.  
 3. View `/metrics` → confirms blocked vs allowed requests.  
 

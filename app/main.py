@@ -8,6 +8,7 @@ from app.detectors import BehavioralDetector
 from app.prometheus_metrics import REQUESTS, ALLOWED, BLOCKED, SUSPICIONS, LATENCY
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from dotenv import load_dotenv
+from urllib.parse import unquote_plus
 
 load_dotenv()
 
@@ -67,9 +68,60 @@ async def protection_middleware(request: Request, call_next):
 
 
 @app.get("/search")
-async def search(q: str = "test"):
-    await asyncio.sleep(0.01)
-    return {"q": q, "results": ["one", "two", "three"]}
+async def search(q: str = ""):
+    """
+    Job-search-like endpoint.
+    Accepts query strings like:
+      ?q=python+developer  or ?q=python%20developer
+    Returns a small mocked list of job titles for a few sample queries.
+    """
+    # decode pluses and percent-encoding to get natural text
+    q_decoded = unquote_plus(q).strip().lower()
+
+    # small in-memory mapping of realistic job search results
+    jobs = {
+        "python developer": [
+            "Backend Python Developer - Singapore",
+            "Full Stack Engineer (Python/React) - Remote",
+            "Senior Software Engineer - Django & FastAPI"
+        ],
+        "react engineer": [
+            "Frontend React Engineer - Bangalore",
+            "React + TypeScript Developer - Singapore",
+            "Senior UI Engineer - Remote"
+        ],
+        "full stack": [
+            "Full Stack Developer (Node.js + React) - Singapore",
+            "Full Stack Engineer (Go + VueJS) - Remote",
+            "Full Stack Software Engineer - Australia"
+        ],
+        "data scientist": [
+            "Data Scientist - ML & Analytics - Singapore",
+            "Senior Data Scientist - Remote",
+            "Machine Learning Engineer - Hybrid"
+        ]
+    }
+
+    # fallback: if q empty, return a few recent/job categories; if not matched, show a helpful message
+    if q_decoded == "":
+        sample = {
+            "query": "",
+            "results": [
+                "Try queries like 'python developer', 'react engineer', 'full stack', 'data scientist'"
+            ]
+        }
+        return sample
+
+    results = jobs.get(q_decoded)
+    if results:
+        return {"query": q_decoded, "results": results}
+
+    # simple fuzzy fallback: check if any keyword exists in keys
+    for key in jobs:
+        if key in q_decoded or any(word in q_decoded for word in key.split()):
+            return {"query": q_decoded, "results": jobs[key]}
+
+    return {"query": q_decoded, "results": [f"No results found for '{q_decoded}'"]}
 
 
 @app.get("/")
