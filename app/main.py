@@ -127,3 +127,14 @@ async def search(q: str = ""):
 @app.get("/")
 async def home():
     return {"status": "ok", "info": "API protection demo"}
+
+
+@app.get("/protected")
+async def protected():
+    """
+    Explicit protected endpoint used to demonstrate rate limiting.
+    Repeated fast requests to this endpoint should start getting 429 responses.
+    """
+    # small delay to simulate work
+    await asyncio.sleep(0.005)
+    return {"status": "ok", "info": "protected endpoint - rate limiting demo"}
