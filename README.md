@@ -41,20 +41,7 @@ GET /search?q=python+developer
 
 ---
 
-### 3. Protected Endpoint (rate-limited)
-```http
-GET /protected
-```
-🔗 [https://api-protection-demo.onrender.com/protected](https://api-protection-demo.onrender.com/protected)  
-➡️ Returns normal JSON at first.  
-➡️ After exceeding rate limits, returns:
-```json
-{"detail": "Too Many Requests"}
-```
-
----
-
-### 4. Prometheus Metrics
+### 3. Prometheus Metrics
 ```http
 GET /metrics
 ```
